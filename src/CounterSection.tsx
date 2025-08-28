@@ -31,6 +31,16 @@ export default function HomeworkChecker({
   const [commitDataArray, setCommitDataArray] = useState<Commit[]>([]);
   const [userProfileSrc, setUserProfileSrc] = useState<string>("");
 
+  const extractLevelTag = (text: string) => {
+    const m = text.match(/\[(level\s*1)\]/i);
+    return m ? m[1].toLowerCase() : null;
+  }
+
+  const extractTitleContentRegex = (text: string) => {
+    const m = text.match(/Title:\s*(.+)/);
+    return m ? m[1].trim() : null;
+  };
+
   useEffect(() => {
     async function fetchCommits() {
       try {
@@ -97,6 +107,7 @@ export default function HomeworkChecker({
         height: "calc(100vh - 110px)",
         border: "1px solid rgba(55, 53, 47, 0.16)",
         borderRadius: "6px",
+        flexGrow: 1,
       }}
     >
       <div style={{ display: "flex", flexDirection: "column" }}>
@@ -137,6 +148,11 @@ export default function HomeworkChecker({
       )}
       <ul style={{ margin: "0px", padding: "0px" }}>
         {commitDataArray.map((commit: Commit, idx: number) => {
+          const commitMessage = commit.commit.message.split(",")[0] ?? "";
+
+          const level = extractLevelTag(commitMessage);
+          const title = extractTitleContentRegex(commitMessage);
+
           return (
             <a
               href={`${commit.html_url}`}
@@ -144,7 +160,6 @@ export default function HomeworkChecker({
               className="link-box"
               style={{
                 display: "block",
-                height: "60px",
                 padding: "8px 12px",
                 borderRadius: "6px",
                 border: "1px solid rgba(28, 19, 1, 0.11)",
@@ -170,12 +185,32 @@ export default function HomeworkChecker({
                     color: "rgb(76, 76, 76)",
                     paddingTop: "2px",
                     fontSize: "16px",
-                    fontWeight: "600"
+                    fontWeight: "600",
+                    overflow: "hidden",
+                    whiteSpace: "nowrap",
+                    textOverflow: "ellipsis"
                   }}
                 >
-                  {commit.commit.message.split(",")[0] ?? ""}
+                  {title !== null
+                    ? title
+                    : commit.commit.message.split(",")[0] ?? ""}
                 </div>
               </div>
+              {level && (
+                <div
+                  style={{
+                    color: "rgb(50, 48, 44)",
+                    backgroundColor: "rgba(28, 19, 1, 0.11)",
+                    margin: "10px 4px 0px 0px",
+                    padding: "2px 6px",
+                    borderRadius: "3px",
+                    width: "fit-content",
+                    fontSize: "12px",
+                  }}
+                >
+                  {level}
+                </div>
+              )}
               <div
                 style={{
                   color: "rgb(50, 48, 44)",
