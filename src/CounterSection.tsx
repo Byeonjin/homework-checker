@@ -146,7 +146,7 @@ export default function HomeworkChecker({
           <p style={{ color: "#ff7f50" }}>💸 이번 주 {minCount}문제 미만! 💸</p>
         </div>
       )}
-      <ul style={{ margin: "0px", padding: "0px" }}>
+      <ul style={{ margin: "16px 0px 0px 0px", padding: "0px" }}>
         {commitDataArray.map((commit: Commit, idx: number) => {
           const commitMessage = commit.commit.message.split(",")[0] ?? "";
 
