@@ -20,6 +20,7 @@ function App() {
           <HomeworkChecker owner="Byeonjin" repo="plantCodingTestGrass" />
           <HomeworkChecker owner="coding-frog117" repo="Programmers" />
           <HomeworkChecker owner="annyoon" repo="ps" />
+          <HomeworkChecker owner="PIGMONGKEY" repo="Algorithm" />
         </div>
       </section>
     </>
