@@ -32,14 +32,28 @@ export default function HomeworkChecker({
   const [userProfileSrc, setUserProfileSrc] = useState<string>("");
 
   const extractLevelTag = (text: string) => {
-    const m = text.match(/\[level\s*(\d+)\]/i);
-    return m ? `level ${m[1]}`.toLowerCase() : null;
+    const m = text.match(/\[([^\]]+)\]/);
+    return m ? `${m[1]}`.toLowerCase() : null;
   };
 
   const extractTitleContentRegex = (text: string) => {
     const m = text.match(/Title:\s*(.+)/);
     return m ? m[1].trim() : null;
   };
+
+  const  isValidCommitMessageFormat = (text: string) => {
+    const regex = /^\[.+\]\s+Title:\s+.+,/;
+
+    return regex.test(text);
+  }
+
+  const isCommittedByPlatform = (
+    message: string,
+    platformName: "BaekjoonHub" | "LeetHub"
+  ) => {
+    return message.includes(platformName);
+  };
+
 
   useEffect(() => {
     async function fetchCommits() {
@@ -66,30 +80,41 @@ export default function HomeworkChecker({
           return;
         }
 
-
-
         const data: Commit[] = await res.json();
 
         const userInfoData = await userInfoRes.json();
 
         setUserProfileSrc(userInfoData.avatar_url ?? "");
         
-        const weeklyCount = data.filter((commit) => {
+        const filteredData = data.filter((commit) => {
+          const isCommittedByBaekjoonHub = isCommittedByPlatform(
+            commit.commit.message
+          , "BaekjoonHub");
 
-          const isCommittedByBaekjoonHub =
-            commit.commit.message.includes("BaekjoonHub");
+          const isCommittedByLeetHub = isCommittedByPlatform(
+            commit.commit.message,
+            "LeetHub"
+          );
 
-          if (!isCommittedByBaekjoonHub) {
+          if (!(isCommittedByBaekjoonHub || isCommittedByLeetHub)) {
+            return false;
+          }
+
+          if (
+            !isValidCommitMessageFormat(commit.commit.message)
+          ) {
             return false;
           }
           
           const commitDate = new Date(commit.commit.author.date);
           return commitDate >= startOfWeek && commitDate <= endOfWeek;
-        }).length;
+        });
+
+        const weeklyCount = filteredData.length;
 
         setCount(weeklyCount);
         setWarning(weeklyCount < minCount);
-        setCommitDataArray(data)
+        setCommitDataArray(filteredData);
       } catch (error) {
         console.error("데이터 가져오기 실패", error);
       }
