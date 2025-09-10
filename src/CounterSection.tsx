@@ -32,9 +32,9 @@ export default function HomeworkChecker({
   const [userProfileSrc, setUserProfileSrc] = useState<string>("");
 
   const extractLevelTag = (text: string) => {
-    const m = text.match(/\[(level\s*1)\]/i);
-    return m ? m[1].toLowerCase() : null;
-  }
+    const m = text.match(/\[level\s*(\d+)\]/i);
+    return m ? `level ${m[1]}`.toLowerCase() : null;
+  };
 
   const extractTitleContentRegex = (text: string) => {
     const m = text.match(/Title:\s*(.+)/);
