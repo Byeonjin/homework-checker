@@ -107,6 +107,7 @@ export default function HomeworkChecker({
         height: "calc(100vh - 110px)",
         border: "1px solid rgba(55, 53, 47, 0.16)",
         borderRadius: "6px",
+        flex: 1,
         flexGrow: 1,
       }}
     >
@@ -146,7 +147,7 @@ export default function HomeworkChecker({
           <p style={{ color: "#ff7f50" }}>💸 이번 주 {minCount}문제 미만! 💸</p>
         </div>
       )}
-      <ul style={{ margin: "16px 0px 0px 0px", padding: "0px" }}>
+      <ul style={{ margin: "16px 0px 0px 0px", padding: "0px",height:"82%", overflow: "auto" }}>
         {commitDataArray.map((commit: Commit, idx: number) => {
           const commitMessage = commit.commit.message.split(",")[0] ?? "";
 
@@ -167,6 +168,7 @@ export default function HomeworkChecker({
                 marginBottom: "16px",
                 textDecoration: "none",
                 transition: "background-color 0.4s ease",
+                width: "calc(100vw / 4 - 80px)",
               }}
               target="_blank"
             >
@@ -188,7 +190,7 @@ export default function HomeworkChecker({
                     fontWeight: "600",
                     overflow: "hidden",
                     whiteSpace: "nowrap",
-                    textOverflow: "ellipsis"
+                    textOverflow: "ellipsis",
                   }}
                 >
                   {title !== null
