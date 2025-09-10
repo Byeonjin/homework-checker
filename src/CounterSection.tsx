@@ -21,18 +21,6 @@ interface HomeworkCheckerProps {
   minCount?: number; 
 }
 
-const getFileList = async (
-  owner: string,
-  repo: string,
-  sha: string,
-) => {
-  const url = `https://api.github.com/repos/${owner}/${repo}/commits/${sha}`;
-
-  const fileDataOfCommit = await fetch(url);
-
-  return fileDataOfCommit;
-};
-
 export default function HomeworkChecker({
   owner,
   repo,
@@ -50,7 +38,6 @@ export default function HomeworkChecker({
 
   const extractTitleContentRegex = (text: string) => {
     const m = text.match(/Title:\s*(.+)/);
-
     return m ? m[1].trim() : null;
   };
 
@@ -82,52 +69,17 @@ export default function HomeworkChecker({
 
 
         const data: Commit[] = await res.json();
-        
-       const convertedData = (
-         await Promise.all(
-           data.map(async (data) => {
-             const isLeetCode = data.commit.message.includes("LeetHub");
-             const isBaekjoonHub = data.commit.message.includes("BaekjoonHub");
-             const isContainReadMe = data.commit.message.includes("README");
 
-             if (isBaekjoonHub) return data;
-
-             if (!isLeetCode || isContainReadMe) return null;
-
-             const commitSHA = data.sha ?? "";
-             const fileListRes = await getFileList(owner, repo, commitSHA);
-             const fileListJSON = await fileListRes.json();
-             const fileList = fileListJSON.files;
-
-             if (!fileList.length) return null;
-
-             const problemLevel = fileList[0].filename.split("/")[1];
-             const problemTitle = fileList[0].filename.split("/")[2];
-             const commitMessageTitle = `[${problemLevel}] Title: ${problemTitle}, -LeetHub`;
-
-             return {
-               ...data,
-               commit: { ...data.commit, message: commitMessageTitle },
-             };
-           })
-         )
-       ).filter((c): c is Commit => c !== null);
-        
         const userInfoData = await userInfoRes.json();
 
         setUserProfileSrc(userInfoData.avatar_url ?? "");
         
-        const weeklyCount = convertedData.filter((commit) => {
-
-          if (commit === null ) return false;
+        const weeklyCount = data.filter((commit) => {
 
           const isCommittedByBaekjoonHub =
             commit.commit.message.includes("BaekjoonHub");
-          
-          const isCommittedByLeetHub =
-            commit.commit.message.includes("LeetHub");
 
-          if (!(isCommittedByBaekjoonHub || isCommittedByLeetHub)) {
+          if (!isCommittedByBaekjoonHub) {
             return false;
           }
           
@@ -137,7 +89,7 @@ export default function HomeworkChecker({
 
         setCount(weeklyCount);
         setWarning(weeklyCount < minCount);
-        setCommitDataArray(convertedData)
+        setCommitDataArray(data)
       } catch (error) {
         console.error("데이터 가져오기 실패", error);
       }
