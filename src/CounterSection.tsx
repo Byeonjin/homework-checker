@@ -58,15 +58,17 @@ export default function HomeworkChecker({
   useEffect(() => {
     async function fetchCommits() {
       try {
-        const today = new Date();
-        const day = today.getDay();
-        const startOfWeek = new Date(today);
-        startOfWeek.setDate(today.getDate() - (day === 0 ? 6 : day - 1));
-        startOfWeek.setHours(0, 0, 0, 0);
+       const today = new Date();
+       const day = today.getDay();
+       const diffToMonday = day === 0 ? -6 : 1 - day;
 
-        const endOfWeek = new Date(startOfWeek);
-        endOfWeek.setDate(startOfWeek.getDate() + 6);
-        endOfWeek.setHours(23, 59, 59, 999);
+       const startOfWeek = new Date(today);
+       startOfWeek.setDate(today.getDate() + diffToMonday);
+       startOfWeek.setHours(10, 30, 0, 0);
+
+       const endOfWeek = new Date(startOfWeek);
+       endOfWeek.setDate(startOfWeek.getDate() + 7);
+       endOfWeek.setMilliseconds(endOfWeek.getMilliseconds() - 1);
 
         const since = startOfWeek.toISOString();
         const until = endOfWeek.toISOString();
